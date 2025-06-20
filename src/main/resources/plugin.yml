@@ -1,0 +1,38 @@
+name: hologram
+version: '${project.version}'
+main: com.heledron.hologram.HologramPlugin
+api-version: '1.20'
+
+commands:
+  items:
+    description: Open the items menu
+    permission: hologram.items
+  globe_settings:
+    description: Set globe settings
+    permission: hologram.globe_settings
+  globe_presets:
+    description: Set globe presets
+    permission: hologram.globe_presets
+  3dsummon:
+    description: Summon 3D models
+    permission: hologram.3dsummon
+  3dremove:
+    description: Remove 3D models
+    permission: hologram.3dremove
+
+permissions:
+  hologram.items:
+    description: Allows access to the items command
+    default: op
+  hologram.globe_settings:
+    description: Allows access to the globe_settings command
+    default: op
+  hologram.globe_presets:
+    description: Allows access to the globe_presets command
+    default: op
+  hologram.3dsummon:
+    description: Allows access to the 3dsummon command
+    default: op
+  hologram.3dremove:
+    description: Allows access to the 3dremove command
+    default: op

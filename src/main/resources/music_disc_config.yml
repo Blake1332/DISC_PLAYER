@@ -1,0 +1,76 @@
+# Bad Apple Video Player Configuration
+
+# Video Settings
+video:
+  # Frame rate for video playback (FPS)
+  frame_rate: 30
+  # Video width in pixels
+  width: 64
+  # Video height in pixels  
+  height: 48
+  # Scale of the video display
+  scale: 1.0
+
+# Display Settings
+display:
+  # Whether text displays should always face the player (billboard mode)
+  # Options: true (always face player), false (fixed orientation)
+  billboard: false
+
+  # Whether to create double-sided displays (visible from both front and back)
+  # Options: true (double-sided, uses 2x entities(more lag)), false (single-sided, uses less entities)
+  double_sided: false
+
+  # Brightness of the display (0-15)
+  brightness: 15
+
+  # Teleport duration for smooth transitions
+  teleport_duration: 1
+
+  # Interpolation duration for smooth transitions
+  interpolation_duration: 1
+
+# Audio Settings
+audio:
+  # Whether to play the Bad Apple music when the disc is inserted
+  # Options: true (play music), false (silent video only)
+  play_music: true
+  # Volume of the music (0.0 to 1.0)
+  volume: 1.0
+  # Whether to use custom audio file instead of vanilla MUSIC_DISC_13
+  # Options: true (use custom file), false (use vanilla sound)
+  use_custom_audio: true
+  # Path to custom audio file (relative to plugins/Hologram/)
+  custom_audio_file: custom_disc.ogg
+
+# Custom Disc Settings
+disc:
+  # Whether to use a custom Bad Apple disc instead of MUSIC_DISC_13
+  # Options: true (use custom disc), false (use MUSIC_DISC_13)
+  use_custom_disc: true
+  # Display name for the custom Bad Apple disc
+  custom_disc_name: "§6Custom Music Disc"
+  # Lore for the custom Bad Apple disc
+  custom_disc_lore:
+    - "§7Plays a custom video above jukeboxes"
+    - ""
+    - "§eRight-click on a jukebox to play!"
+
+# Position Settings
+position:
+  # Height above jukebox (in blocks)
+  height_above_jukebox: 1.5
+  # X offset from jukebox center
+  x_offset: 0.5
+  # Z offset from jukebox center
+  z_offset: 0.5
+
+# File Settings
+files:
+  # Directory containing video frames
+  frames_directory: plugins/Hologram/music_disc_frames
+  # Supported image formats
+  supported_formats:
+    - png
+    - jpg
+    - jpeg 
