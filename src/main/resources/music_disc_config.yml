@@ -1,15 +1,79 @@
-# Bad Apple Video Player Configuration
+# Music Disc Configuration
+# This file configures the Bad Apple video player for music discs
 
 # Video Settings
 video:
-  # Frame rate for video playback (FPS)
-  frame_rate: 30
-  # Video width in pixels
+  # Directory containing video frames (relative to plugin data folder)
+  frames_directory: "bad_apple_frames"
+  
+  # Video dimensions (width x height in pixels)
   width: 64
-  # Video height in pixels  
-  height: 48
-  # Scale of the video display
-  scale: 1.0
+  height: 64
+  
+  # Frame rate (frames per second)
+  frame_rate: 30
+  
+  # Scale of the video display (1.0 = normal size)
+  scale: 2.0
+  
+  # Height above jukebox where video is displayed
+  height_above_jukebox: 3.0
+  
+  # X and Z offset from jukebox center
+  x_offset: 0.0
+  z_offset: 0.0
+  
+  # Whether to loop the video when it ends
+  loop: true
+  
+  # Whether to make the video double-sided (visible from both sides)
+  double_sided: false
+  
+  # Whether to make the video billboard (always face the player)
+  billboard: true
+  
+  # Brightness of the video display (0-15)
+  brightness: 15
+  
+  # Teleport duration for display entities (in ticks)
+  teleport_duration: 5
+  
+  # Interpolation duration for display entities (in ticks)
+  interpolation_duration: 5
+
+# Audio Settings
+audio:
+  # Whether to use custom audio file instead of vanilla MUSIC_DISC_BLOCKS
+  use_custom_audio: false
+  
+  # Custom audio file path (relative to plugin data folder)
+  custom_audio_file: "bad_apple.ogg"
+  
+  # Volume for custom audio (0.0 - 1.0)
+  volume: 1.0
+
+# Disc Settings
+disc:
+  # Whether to use a custom Bad Apple disc instead of MUSIC_DISC_BLOCKS
+  # Options: true (use custom disc), false (use MUSIC_DISC_BLOCKS)
+  use_custom_disc: true
+  
+  # Custom disc name (only used if use_custom_disc is true)
+  custom_disc_name: "§6Bad Apple Music Disc"
+  
+  # Custom disc lore (only used if use_custom_disc is true)
+  custom_disc_lore:
+    - "§7A mysterious music disc"
+    - "§7that plays a special video"
+    - "§7when inserted into a jukebox."
+
+# Dropper Detection
+dropper:
+  # Whether to detect when droppers automatically insert discs into jukeboxes
+  detect_insertion: true
+  
+  # Whether to accept regular MUSIC_DISC_BLOCKS items from droppers (in addition to custom discs)
+  accept_regular_discs: true
 
 # Display Settings
 display:
@@ -30,33 +94,7 @@ display:
   # Interpolation duration for smooth transitions
   interpolation_duration: 1
 
-# Audio Settings
-audio:
-  # Whether to play the Bad Apple music when the disc is inserted
-  # Options: true (play music), false (silent video only)
-  play_music: true
-  # Volume of the music (0.0 to 1.0)
-  volume: 1.0
-  # Whether to use custom audio file instead of vanilla MUSIC_DISC_13
-  # Options: true (use custom file), false (use vanilla sound)
-  use_custom_audio: true
-  # Path to custom audio file (relative to plugins/Hologram/)
-  custom_audio_file: custom_disc.ogg
-
-# Custom Disc Settings
-disc:
-  # Whether to use a custom Bad Apple disc instead of MUSIC_DISC_13
-  # Options: true (use custom disc), false (use MUSIC_DISC_13)
-  use_custom_disc: true
-  # Display name for the custom Bad Apple disc
-  custom_disc_name: "§6Custom Music Disc"
-  # Lore for the custom Bad Apple disc
-  custom_disc_lore:
-    - "§7Plays a custom video above jukeboxes"
-    - ""
-    - "§eRight-click on a jukebox to play!"
-
-# Position Settings
+ # Position Settings
 position:
   # Height above jukebox (in blocks)
   height_above_jukebox: 1.5
