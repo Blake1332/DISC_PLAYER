@@ -30,6 +30,7 @@ object MusicDiscConfig {
         if (!cfg.contains("video.width")) cfg.set("video.width", 64)
         if (!cfg.contains("video.height")) cfg.set("video.height", 48)
         if (!cfg.contains("video.scale")) cfg.set("video.scale", 1.0)
+        if (!cfg.contains("video.loop")) cfg.set("video.loop", false)
         
         // Display settings
         if (!cfg.contains("display.billboard")) cfg.set("display.billboard", false)
@@ -62,6 +63,10 @@ object MusicDiscConfig {
             "§eRight-click on a jukebox to play!"
         ))
         
+        // Dropper settings
+        if (!cfg.contains("dropper.detect_dropper_insertion")) cfg.set("dropper.detect_dropper_insertion", true)
+        if (!cfg.contains("dropper.accept_regular_discs")) cfg.set("dropper.accept_regular_discs", true)
+        
         save()
     }
     
@@ -78,6 +83,7 @@ object MusicDiscConfig {
     val videoWidth: Int get() = config?.getInt("video.width", 64) ?: 64
     val videoHeight: Int get() = config?.getInt("video.height", 48) ?: 48
     val scale: Float get() = config?.getDouble("video.scale", 1.0)?.toFloat() ?: 1.0f
+    val loop: Boolean get() = config?.getBoolean("video.loop", false) ?: false
     
     // Display settings
     val billboard: Boolean get() = config?.getBoolean("display.billboard", false) ?: false
@@ -100,6 +106,10 @@ object MusicDiscConfig {
         "",
         "§eRight-click on a jukebox to play!"
     )
+    
+    // Dropper settings
+    val detectDropperInsertion: Boolean get() = config?.getBoolean("dropper.detect_dropper_insertion", true) ?: true
+    val acceptRegularDiscs: Boolean get() = config?.getBoolean("dropper.accept_regular_discs", true) ?: true
     
     // Position settings
     val heightAboveJukebox: Double get() = config?.getDouble("position.height_above_jukebox", 1.5) ?: 1.5

@@ -12,23 +12,30 @@ object Disc {
     private val discKey = namespacedID("music_disc")
     
     fun createDisc(): ItemStack {
-        val disc = ItemStack(Material.MUSIC_DISC_13) // Use MUSIC_DISC_13 as base
-        val meta = disc.itemMeta ?: return disc
+        val disc = ItemStack(Material.MUSIC_DISC_BLOCKS) // Use MUSIC_DISC_BLOCKS as base
+        val meta = disc.itemMeta
         
-        // Set custom name and lore
-        meta.setDisplayName(MusicDiscConfig.customDiscName)
-        meta.lore = MusicDiscConfig.customDiscLore
+        if (meta != null) {
+            meta.setDisplayName("§6Bad Apple Music Disc")
+            meta.lore = listOf(
+                "§7A mysterious music disc",
+                "§7that plays a special video",
+                "§7when inserted into a jukebox."
+            )
+            meta.persistentDataContainer.set(discKey, PersistentDataType.BOOLEAN, true)
+            disc.itemMeta = meta
+        }
         
-        // Add custom identifier
-        meta.persistentDataContainer.set(discKey, PersistentDataType.BOOLEAN, true)
-        
-        disc.itemMeta = meta
         return disc
     }
     
     fun isDisc(item: ItemStack): Boolean {
-        if (item.type != Material.MUSIC_DISC_13) return false
+        if (item.type != Material.MUSIC_DISC_BLOCKS) return false
         
+        // If acceptRegularDiscs is enabled, accept any MUSIC_DISC_BLOCKS
+        if (MusicDiscConfig.acceptRegularDiscs) return true
+        
+        // Otherwise, only accept custom discs with our identifier
         val meta = item.itemMeta ?: return false
         return meta.persistentDataContainer.get(discKey, PersistentDataType.BOOLEAN) == true
     }

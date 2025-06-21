@@ -20,11 +20,12 @@ import org.bukkit.entity.Player
 import org.bukkit.util.Vector
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.block.BlockBreakEvent
+import org.bukkit.event.block.BlockDispenseEvent
+import org.bukkit.inventory.ItemStack
 import org.joml.Matrix4f
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
-import org.bukkit.inventory.ItemStack
 
 class BadApplePlayer {
     private var videoFrames = mutableListOf<BufferedImage>()
@@ -119,16 +120,16 @@ class BadApplePlayer {
         return if (MusicDiscConfig.useCustomDisc) {
             Disc.isDisc(item)
         } else {
-            item.type == Material.MUSIC_DISC_13
+            item.type == Material.MUSIC_DISC_BLOCKS
         }
     }
     
     private fun isDisc(material: Material?): Boolean {
         if (material == null) return false
         return if (MusicDiscConfig.useCustomDisc) {
-            material == Material.MUSIC_DISC_13
+            material == Material.MUSIC_DISC_BLOCKS
         } else {
-            material == Material.MUSIC_DISC_13
+            material == Material.MUSIC_DISC_BLOCKS
         }
     }
     
@@ -156,7 +157,25 @@ class BadApplePlayer {
             
             // Calculate current frame based on time since start
             val timeSinceStart = currentTime - jukeboxData.startTick
-            val currentFrame = ((timeSinceStart * frameRate / 20) % videoFrames.size).toInt()
+            val totalFrames = videoFrames.size
+            val framesPerSecond = frameRate.toFloat()
+            val ticksPerSecond = 20.0f
+            val totalVideoDuration = (totalFrames / framesPerSecond * ticksPerSecond).toLong()
+            
+            // Check if video has finished
+            if (!MusicDiscConfig.loop && timeSinceStart >= totalVideoDuration) {
+                // Video has finished, stop it
+                jukeboxesToRemove.add(position)
+                println("Video finished at jukebox: ${jukebox.location}")
+                continue
+            }
+            
+            // Calculate current frame (with looping if enabled)
+            val currentFrame = if (MusicDiscConfig.loop) {
+                ((timeSinceStart * frameRate / 20) % totalFrames).toInt()
+            } else {
+                ((timeSinceStart * frameRate / 20).toInt()).coerceAtMost(totalFrames - 1)
+            }
             
             renderFrameForJukebox(jukeboxData, currentFrame)
         }
@@ -296,10 +315,16 @@ fun setupBadApplePlayer() {
                     com.heledron.hologram.utilities.currentPlugin,
                     java.lang.Runnable {
                         val jukebox = clickedBlock.state as? Jukebox
-                        if (jukebox != null && jukebox.playing == Material.MUSIC_DISC_13) {
-                            // Since we know this is our custom disc (we checked isDisc above),
-                            // we can start the video
-                            badApplePlayer.startJukeboxVideo(jukebox)
+                        if (jukebox != null) {
+                            // Check if jukebox is playing our disc (custom or regular if accepted)
+                            val isPlayingOurDisc = jukebox.playing == Material.MUSIC_DISC_BLOCKS && 
+                                (jukebox.inventory.any { itemStack -> 
+                                    itemStack != null && Disc.isDisc(itemStack) 
+                                } || MusicDiscConfig.acceptRegularDiscs)
+                            
+                            if (isPlayingOurDisc) {
+                                badApplePlayer.startJukeboxVideo(jukebox)
+                            }
                         }
                     },
                     2L // Check after 2 ticks to ensure the disc is inserted
@@ -338,12 +363,81 @@ fun setupBadApplePlayer() {
                     com.heledron.hologram.utilities.currentPlugin,
                     java.lang.Runnable {
                         val jukebox = clickedBlock.state as? Jukebox
-                        if (jukebox != null && jukebox.playing != Material.MUSIC_DISC_13) {
+                        if (jukebox != null && jukebox.playing != Material.MUSIC_DISC_BLOCKS) {
                             badApplePlayer.stopJukeboxVideo(jukebox)
                         }
                     },
                     2L // Check after 2 ticks to ensure the disc is ejected
                 )
+            }
+        }
+    })
+    
+    // Listen for inventory move events to detect automatic disc insertion by droppers
+    addEventListener(object : org.bukkit.event.Listener {
+        @org.bukkit.event.EventHandler(priority = org.bukkit.event.EventPriority.MONITOR)
+        fun onInventoryMoveItem(event: org.bukkit.event.inventory.InventoryMoveItemEvent) {
+            // Only process if dropper detection is enabled
+            if (!MusicDiscConfig.detectDropperInsertion) return
+            
+            val source = event.source
+            val destination = event.destination
+            val item = event.item
+            
+            // Check if an item is being moved from a dropper to a jukebox
+            if (source.holder is org.bukkit.block.Dropper && 
+                destination.holder is Jukebox &&
+                (Disc.isDisc(item) || (MusicDiscConfig.acceptRegularDiscs && item.type == Material.MUSIC_DISC_BLOCKS))) {
+                
+                println("=== INVENTORY MOVE DEBUG ===")
+                println("Item moved from dropper to jukebox: ${item.type}")
+                println("Source: ${source.holder}")
+                println("Destination: ${destination.holder}")
+                
+                val jukebox = destination.holder as Jukebox
+                println("Jukebox location: ${jukebox.location}")
+                println("Jukebox playing: ${jukebox.playing}")
+                println("Jukebox has record: ${jukebox.hasRecord()}")
+                println("Jukebox is playing: ${jukebox.isPlaying()}")
+                println("Jukebox inventory contents:")
+                jukebox.inventory.forEachIndexed { index, itemStack ->
+                    if (itemStack != null) {
+                        println("  Slot $index: ${itemStack.type}")
+                    }
+                }
+                
+                // Schedule a check after the item is moved
+                org.bukkit.Bukkit.getScheduler().runTaskLater(
+                    com.heledron.hologram.utilities.currentPlugin,
+                    java.lang.Runnable {
+                        println("=== CHECKING AFTER MOVE ===")
+                        println("Jukebox playing: ${jukebox.playing}")
+                        println("Jukebox has record: ${jukebox.hasRecord()}")
+                        println("Jukebox is playing: ${jukebox.isPlaying()}")
+                        println("Jukebox inventory contents after move:")
+                        jukebox.inventory.forEachIndexed { index, itemStack ->
+                            if (itemStack != null) {
+                                println("  Slot $index: ${itemStack.type}")
+                            }
+                        }
+                        
+                        // Check if jukebox inventory contains our disc and is playing
+                        val hasOurDisc = jukebox.inventory.any { itemStack ->
+                            itemStack != null && (Disc.isDisc(itemStack) || 
+                                (MusicDiscConfig.acceptRegularDiscs && itemStack.type == Material.MUSIC_DISC_BLOCKS))
+                        }
+                        
+                        if (hasOurDisc && jukebox.isPlaying()) {
+                            badApplePlayer.startJukeboxVideo(jukebox)
+                            println("Dropper inserted music disc into jukebox at ${jukebox.location}")
+                        } else {
+                            println("Jukebox does not have our disc or is not playing. Has disc: $hasOurDisc, is playing: ${jukebox.isPlaying()}")
+                        }
+                        println("=== CHECKING AFTER MOVE END ===")
+                    },
+                    2L // Check after 2 ticks to ensure the item is moved
+                )
+                println("=== INVENTORY MOVE DEBUG END ===")
             }
         }
     })
