@@ -1,4 +1,4 @@
-# Bad Apple Video Player for Minecraft Hologram Plugin
+# Yes... this runs bad apple in minecraft, and every other video also!
 
 ## This is a simplified version of https://github.com/TheCymaera/minecraft-hologram that is seperated developed to run video in vanila minecraft using display entities.
 ### This current version is current intergrated into the fork at my other repo. Https://github.com/Blake1332/minecraft-hologram/tree/main
